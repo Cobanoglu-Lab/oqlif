@@ -1,4 +1,4 @@
-# oqlif ![leaf](leaf.png)
+# oqlif <img src="https://raw.githubusercontent.com/Cobanoglu-Lab/oqlif/master/leaf.png" width="36">
 Quantifies scRNA-seq BAM files by taking multi-maps into account.
 
 Takes alignment and single cell barcode annotated BAM files as input, 
