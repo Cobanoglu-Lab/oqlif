@@ -1,3 +1,9 @@
+####################################
+# Copyright © 2019, University of Texas Southwestern Medical Center. All rights reserved.
+# Contributors: Murat Can Cobanoglu
+# Department: Lyda Hill Department of Bioinformatics
+####################################
+
 import os
 import argparse
 from collections import defaultdict
