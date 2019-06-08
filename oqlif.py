@@ -19,7 +19,7 @@ from scipy.io import mmwrite
 def get_expr_dict(input_tuple):
   """Returns the quantification results as a dict of dicts."""
 
-  fname, contig, start, stop, length, worker_ind = input_tuple
+  bamfname, indexfname, contig, start, stop, length, worker_ind = input_tuple
   if worker_ind == None: worker_ind = 0
   if contig is None: 
     desc_str='all_reads'
@@ -33,7 +33,7 @@ def get_expr_dict(input_tuple):
   )
   
   expr = {}
-  with pysam.AlignmentFile(fname, "rb") as samfile:
+  with pysam.AlignmentFile(bamfname, "rb", index_filename=indexfname) as samfile:
     for read in tqdm(samfile.fetch(until_eof=True, multiple_iterators=True, **region), 
                       total=length, position=worker_ind, leave=True, desc=desc_str):
       tags = read.get_tags()
@@ -137,6 +137,9 @@ if __name__ == '__main__':
 
   parser.add_argument('bamfile', help='The BAM file that stores the alignment results')
 
+  parser.add_argument('indexfile', help='The name of the BAI file. Set to `default` to use'+\
+          ' the same name as `bamfile` appended with \'.bai\'')
+
   parser.add_argument('--ens2name', default='n/a', 
     help='A tab-separated text file with only two columns and no header that maps ENS'+\
       ' identifiers to their human readable names. You can download from Ensembl BioMart. '+\
@@ -166,19 +169,25 @@ if __name__ == '__main__':
   bcode = args.bcode
   outd = args.outdir
   bamfile = args.bamfile
+  indexfile = args.indexfile
+  if indexfile == 'default':
+    indexfile = bamfile+'.bai'
+  for f in [bamfile, indexfile]:
+    if not os.path.isfile(f):
+      raise ValueError('{0:s} is not a valid file.'.format(f))
   ens2name = read_ens2name(args.ens2name)
 
   if not os.path.isdir(outd):
     os.mkdir(outd)
 
   contigs = []; lengths = []
-  with pysam.AlignmentFile(bamfile) as samfile:
+  with pysam.AlignmentFile(bamfile, "rb", index_filename=indexfile) as samfile:
     for stat in samfile.get_index_statistics():
       contig = stat.contig
       if contig.isnumeric() or contig=='MT' or contig=='X' or contig=='Y':
         contigs.append(contig)
         lengths.append(stat.total)
-  inputs = [(bamfile, contig, None, None, lengths[i], i) for i,contig in enumerate(contigs)]
+  inputs = [(bamfile, indexfile, contig, None, None, lengths[i], i) for i,contig in enumerate(contigs)]
   if args.parallel:
     with mp.Pool() as pool:
       exprs = pool.map(get_expr_dict, inputs)
