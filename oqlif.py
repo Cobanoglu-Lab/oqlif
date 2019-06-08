@@ -1,5 +1,5 @@
 ####################################
-# Copyright © 2019, University of Texas Southwestern Medical Center. All rights reserved.
+# Copyright (c) 2019, University of Texas Southwestern Medical Center. All rights reserved.
 # Contributors: Murat Can Cobanoglu
 # Department: Lyda Hill Department of Bioinformatics
 ####################################
@@ -133,7 +133,7 @@ def write(expr, outd, ens2name=None, integer=False):
 
 if __name__ == '__main__':
 
-  parser = argparse.ArgumentParser(description='Quantify reads from BAM files')
+  parser = argparse.ArgumentParser(description='Multi-map aware read quantification from BAM files')
 
   parser.add_argument('bamfile', help='The BAM file that stores the alignment results')
 
